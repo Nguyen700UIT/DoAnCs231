@@ -1,0 +1,33 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local datasets and generated experiment outputs
+/data/
+/outputs/
+*.keras
+*.h5
+*.hdf5
+*.ckpt*
+*.joblib
+*.pkl
+*.onnx
+*.tflite
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+
+# Editor and operating system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
