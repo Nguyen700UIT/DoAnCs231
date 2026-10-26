@@ -55,6 +55,8 @@ Dùng Gradio để tải ảnh một quả tắc đã tách nền và hiển th�
 
 Dùng Python, thụt lề bốn dấu cách; `snake_case` cho hàm, biến và file. Viết hàm ngắn, chú thích tiếng Việt. Chưa cấu hình formatter hoặc linter.
 
+Code đơn giản không cầu kì viết tối thiểu.
+
 ## Testing & Experiment Guidelines
 
 Dự kiến dùng pytest, đặt tên `test_*.py`; chưa có ngưỡng coverage. Kiểm tra kích thước feature, histogram LBP, xử lý mask không có điểm hợp lệ, thứ tự lớp và fusion.
