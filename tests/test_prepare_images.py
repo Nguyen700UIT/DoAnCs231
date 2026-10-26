@@ -48,7 +48,7 @@ class PrepareImagesTests(unittest.TestCase):
                 preparation.prepare_image(self.path, object())
 
     def test_batch_saves_pairs_reuses_session_and_refuses_overwrite(self):
-        second = self.input_dir / "sub" / "fruit.png"
+        second = self.input_dir / "sub" / "other.png"
         second.parent.mkdir()
         second.write_bytes(self.path.read_bytes())
         output = self.root / "processed"
@@ -64,11 +64,26 @@ class PrepareImagesTests(unittest.TestCase):
             self.assertEqual(remove.call_count, 2)
             for call in remove.call_args_list:
                 self.assertIs(call.kwargs["session"], new_session.return_value)
-            for relative in (Path("fruit.png.png"), Path("sub/fruit.png.png")):
+            for relative in (Path("fruit.png.png"), Path("other.png.png")):
                 self.assertTrue((output / "images" / relative).is_file())
                 self.assertTrue((output / "masks" / relative).is_file())
+            self.assertFalse((output / "images" / "sub").exists())
+            self.assertFalse((output / "masks" / "sub").exists())
             with self.assertRaises(FileExistsError):
                 preparation.main()
+
+    def test_duplicate_names_are_rejected_before_processing(self):
+        second = self.input_dir / "sub" / "fruit.png"
+        second.parent.mkdir()
+        second.write_bytes(self.path.read_bytes())
+        with (
+            patch.object(preparation, "INPUT_DIR", self.input_dir),
+            patch.object(preparation, "OUTPUT_DIR", self.root / "processed"),
+            patch.object(preparation, "new_session") as new_session,
+        ):
+            with self.assertRaisesRegex(ValueError, "trùng tên"):
+                preparation.main()
+            new_session.assert_not_called()
 
 
 if __name__ == "__main__":

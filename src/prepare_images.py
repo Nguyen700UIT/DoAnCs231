@@ -56,6 +56,7 @@ def main():
     if not paths:
         raise ValueError(f"Không tìm thấy ảnh trong {INPUT_DIR}")
 
+
     cache = PROJECT_DIR / "outputs" / ".rembg"
     os.environ.setdefault("REMBG_HOME", str(cache))
     os.environ.setdefault("U2NET_HOME", str(cache))
@@ -67,8 +68,7 @@ def main():
         print(f"[{index}/{len(paths)}] {path.name}", flush=True)
         try:
             image, mask = prepare_image(path, session)
-            relative = path.relative_to(INPUT_DIR)
-            name = relative.with_name(relative.name + ".png")
+            name = path.name + ".png"
             for folder, result in (("images", image), ("masks", mask)):
                 destination = OUTPUT_DIR / folder / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
