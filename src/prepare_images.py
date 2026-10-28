@@ -9,7 +9,7 @@ from rembg import new_session, remove
 
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
-INPUT_DIR = PROJECT_DIR / "raw_img"
+INPUT_DIR = PROJECT_DIR / "images"
 OUTPUT_DIR = PROJECT_DIR / "outputs" / "prepared_224"
 MODEL = "u2netp"
 SIZE = 224
@@ -68,7 +68,8 @@ def main():
         print(f"[{index}/{len(paths)}] {path.name}", flush=True)
         try:
             image, mask = prepare_image(path, session)
-            name = path.name + ".png"
+            relative = path.relative_to(INPUT_DIR)
+            name = relative.with_name(relative.name + ".png")
             for folder, result in (("images", image), ("masks", mask)):
                 destination = OUTPUT_DIR / folder / name
                 destination.parent.mkdir(parents=True, exist_ok=True)

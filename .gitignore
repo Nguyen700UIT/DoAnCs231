@@ -1,5 +1,6 @@
 # Python environments and caches
 .venv/
+.venv-rembg/
 venv/
 __pycache__/
 *.py[cod]
@@ -19,7 +20,8 @@ __pycache__/
 *.pkl
 *.onnx
 *.tflite
-/raw_img
+/images
+/paper
 
 # Credentials and local configuration
 .env
