@@ -42,7 +42,7 @@ Theo [khuyến nghị của dataset](https://zenodo.org/records/11449977), crop 
 
 - Đề xuất dùng bản `s_1024.zip` cho thí nghiệm chính; bản 256 chỉ dùng kiểm tra pipeline nhanh. Không trộn các bản độ phân giải như các ảnh độc lập.
 - Đọc ảnh RGB và xử lý hướng EXIF trước khi xác định crop; thống nhất cách làm tròn tọa độ. Giữ ảnh gốc và ID, không tách nền hoặc dùng mask quả.
-- Crop vùng đường rồi đưa về `224 × 224`. Mặc định giữ tỉ lệ bằng resize vừa khung và padding đối xứng kiểu phản chiếu; lưu thông số hình học để tái lập. Kiểm tra trực quan padding không chiếm quá nhiều ảnh hoặc tạo kết cấu gây nhiễu trước khi cố định cấu hình.
+- Crop vùng đường, resize giữ tỉ lệ để cạnh ngắn bằng 224 pixel, rồi center crop thành `224 × 224`, không thêm padding. Lưu thông số hình học để tái lập; kiểm tra trực quan vùng cắt cuối vẫn thể hiện bề mặt đường được gán nhãn.
 - Dùng cùng vùng crop và quy tắc hình học cho mọi mô hình. SVM lấy HOG/LBP trên ảnh xám và histogram trên ảnh RGB; CNN nhận RGB với tiền xử lý riêng cho backbone.
 - Không làm mịn mạnh vì có thể mất kết cấu. Chỉ augmentation trên train; bắt đầu với lật ngang, biến đổi sáng nhẹ và xoay góc nhỏ. Tránh biến đổi làm vùng ảnh chuyển sang bề mặt khác hoặc thay đổi màu quá mức.
 - Validation, test và demo dùng quy trình xác định, không augmentation ngẫu nhiên. Không dùng metadata vị trí/người chụp làm đặc trưng dự đoán.

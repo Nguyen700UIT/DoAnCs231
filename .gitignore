@@ -22,7 +22,7 @@ __pycache__/
 *.tflite
 /images
 /paper
-
+/dataset
 # Credentials and local configuration
 .env
 .env.*
