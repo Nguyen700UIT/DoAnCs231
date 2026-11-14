@@ -10,12 +10,12 @@ def preprocess_img(img_path, size=224):
     width, height = image.size
     img_cropped = image.crop((0.25 * width, 0.5 * height, 0.75 * width, height))
 
-    # Resize giữ tỉ lệ để cạnh ngắn bằng kích thước đầu ra.
+    # Resize 
     scale = size / min(img_cropped.size)
     new_size = tuple(max(size, round(side * scale)) for side in img_cropped.size)
     resized_img = img_cropped.resize(new_size, Image.Resampling.LANCZOS)
 
-    # Cắt phần giữa ảnh thành hình vuông, không thêm padding.
+    # Center crop
     left = (resized_img.width - size) // 2
     top = (resized_img.height - size) // 2
     prepared_img = resized_img.crop(
@@ -27,8 +27,8 @@ def preprocess_img(img_path, size=224):
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--input_dir", type=Path, required=True, help="Đường dẫn thư mục ảnh đầu vào")
-    parser.add_argument("--output_dir", type=Path, required=True, help="Đường dẫn thư mục ảnh đầu ra")
+    parser.add_argument("--input_dir", type=Path, required=True, help="Input directory")
+    parser.add_argument("--output_dir", type=Path, required=True, help="Output directory")
 
     args = parser.parse_args()
 
@@ -36,7 +36,7 @@ def main():
     output_dir = args.output_dir
 
     if not input_dir.is_dir():
-        raise NotADirectoryError(f"Không tìm thấy thư mục ảnh: {input_dir}")
+        raise NotADirectoryError(f"Did not find directory: {input_dir}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     extensions = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tif", ".tiff"}
@@ -48,7 +48,7 @@ def main():
         _, prepared_image = preprocess_img(img_path)
         output_path = output_dir / f"{img_path.stem}.png"
         prepared_image.save(output_path)
-        print(f"Đã lưu: {output_path}")
+        print(f"Saved: {output_path}")
 
 
 if __name__ == "__main__":

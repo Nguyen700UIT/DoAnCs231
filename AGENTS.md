@@ -16,11 +16,11 @@ Nguồn: [StreetSurfaceVis V1.0 trên Zenodo](https://zenodo.org/records/1144997
 
 | ID quy ước | Nhãn gốc | Tên hiển thị | Số ảnh theo bảng công bố |
 | --- | --- | --- | ---: |
-| 0 | `asphalt` | Nhựa đường | 3.735 |
+| 0 | `unpaved` | Đường đất | 1.016 |
 | 1 | `concrete` | Bê tông | 972 |
-| 2 | `paving_stones` | Đường lát gạch | 2.037 |
+| 2 | `sett` | Đường lát đá khối | 1.363 |
 
-Tổng dự kiến: **6.744 ảnh** trước kiểm tra file và trùng lặp. Loại `sett`, `unpaved`; không gộp `sett` vào `paving_stones`. Không dùng `surface_quality` làm mục tiêu.
+Không dùng `surface_quality` làm mục tiêu.
 
 Giữ `mapillary_image_id`, tọa độ, thời gian chụp và cờ `train`. Tác giả dành `train=False` cho test từ năm thành phố riêng. Ảnh có giấy phép CC-BY-SA; ghi nguồn, tác giả và giấy phép khi sử dụng, minh họa hoặc phân phối lại.
 
@@ -138,7 +138,7 @@ Chỉ nạp mô hình đã huấn luyện, không huấn luyện lại khi dự 
 
 ## Coding Style & Testing Guidelines
 
-Dùng Python, thụt lề bốn dấu cách; `snake_case` cho hàm, biến và file. Viết hàm ngắn, chú thích tiếng Việt. Code đơn giản, tối thiểu; chưa cấu hình formatter hoặc linter.
+Dùng Python, thụt lề bốn dấu cách; `snake_case` cho hàm, biến và file. Viết hàm ngắn, chú thích tiếng Anh. Code đơn giản, tối thiểu; chưa cấu hình formatter hoặc linter.
 
 Dự kiến dùng pytest với `test_*.py`, chưa có ngưỡng coverage. Khi triển khai, kiểm tra:
 
