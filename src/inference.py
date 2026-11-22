@@ -1,4 +1,8 @@
+import cv2
+import joblib
+import numpy as np
 import torch
+from skimage.feature import hog
 from torch import nn
 from torchvision import transforms
 from torchvision.models import MobileNet_V2_Weights, mobilenet_v2
@@ -10,6 +14,28 @@ DISPLAY_NAMES = ("Đường đất", "Bê tông", "Lát đá khối")
 TO_TENSOR = transforms.ToTensor()
 IMAGENET = MobileNet_V2_Weights.IMAGENET1K_V1.transforms()
 NORMALIZE = transforms.Normalize(IMAGENET.mean, IMAGENET.std)
+
+
+def extract_svm_features(image):
+    # Match the HOG + HSV extraction in cs231-svm.ipynb.
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    hog_features = hog(
+        gray,
+        orientations=9,
+        pixels_per_cell=(8, 8),
+        cells_per_block=(2, 2),
+        block_norm="L2-Hys",
+        feature_vector=True,
+    )
+    hog_features = hog_features / (np.linalg.norm(hog_features) + 1e-7)
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    hist_features = np.concatenate([
+        cv2.calcHist([hsv], [channel], None, [16], value_range).flatten()
+        for channel, value_range in ((0, [0, 180]), (1, [0, 256]), (2, [0, 256]))
+    ])
+    hist_features = hist_features / (np.linalg.norm(hist_features) + 1e-7)
+    return np.concatenate([hog_features, hist_features]).astype(np.float32)
 
 
 class SmallCustomCNN(nn.Module):
@@ -69,6 +95,7 @@ class RoadPredictor:
         self.mobile = ModifiedMobileNetV2()
         self.mobile.load_state_dict(mobile["model_state_dict"])
         self.mobile.eval()
+        self.svm = joblib.load(run_dir / "hog_hist_svm_pipeline.joblib")
 
     @torch.inference_mode()
     def predict(self, image_path):
@@ -76,4 +103,14 @@ class RoadPredictor:
         batch = TO_TENSOR(crop).unsqueeze(0)
         custom_scores = self.custom(batch).softmax(dim=1)[0].tolist()
         mobile_scores = self.mobile(NORMALIZE(batch)).softmax(dim=1)[0].tolist()
-        return crop, dict(zip(DISPLAY_NAMES, custom_scores)), dict(zip(DISPLAY_NAMES, mobile_scores))
+        svm_input = cv2.resize(np.asarray(crop), (128, 128))
+        features = extract_svm_features(svm_input).reshape(1, -1)
+        svm_scores = self.svm.predict_proba(features)[0]
+        svm_result = {
+            DISPLAY_NAMES[int(class_id)]: float(score)
+            for class_id, score in zip(self.svm.classes_, svm_scores)
+        }
+        return (
+            crop, dict(zip(DISPLAY_NAMES, custom_scores)),
+            dict(zip(DISPLAY_NAMES, mobile_scores)), svm_input, svm_result,
+        )
