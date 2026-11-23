@@ -1,12 +1,14 @@
 ﻿
 # Demo phân loại mặt đường
 
-Ứng dụng Gradio dùng hai mô hình đã huấn luyện trong `notebooks/cs231-cnn.ipynb`. Tải ảnh đường phố để xem vùng cắt 224 × 224 và điểm dự đoán cho ba lớp đường đất, bê tông và lát đá khối.
+Ứng dụng Gradio dùng hai CNN trong `notebooks/cs231-cnn.ipynb` và SVM trong `notebooks/cs231-svm.ipynb`. Tải ảnh đường phố để xem vùng cắt và dự đoán cho ba lớp đường đất, bê tông và lát đá khối.
+
+Đặt `hog_hist_svm_pipeline.joblib` tải từ `/kaggle/working/` vào `models/` cùng checkpoint CNN. CNN giữ ảnh đầu vào 224 × 224; SVM nhận cùng vùng crop được resize về 128 × 128 và trích HOG + HSV đúng notebook.
 
 Chạy từ thư mục dự án với môi trường Python đã kích hoạt.
 
 ```powershell
-python -m pip install gradio torch torchvision pillow
+python -m pip install gradio torch torchvision pillow numpy opencv-python-headless scikit-image scikit-learn joblib
 python app.py
 ```
 

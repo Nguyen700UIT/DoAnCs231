@@ -20,13 +20,15 @@ def build_app(run_dir):
     with gr.Blocks(title="Phân loại mặt đường", analytics_enabled=False) as app:
         gr.Markdown("# Phân loại mặt đường\nKết quả dự đoán áp dụng cho vùng ảnh cắt.")
         with gr.Row():
-            original = gr.Image(label="Ảnh gốc", type="filepath", sources=["upload"])
-            crop = gr.Image(label="Ảnh đầu vào mô hình (224 × 224)", interactive=False)
+            original = gr.Image(label="Ảnh gốc", type="filepath", sources=["upload"], height=320)
+            crop = gr.Image(label="Ảnh đầu vào CNN (224 × 224)", interactive=False, height=320)
+            svm_input = gr.Image(label="Ảnh đầu vào SVM (128 × 128)", interactive=False, height=320)
         submit = gr.Button("Dự đoán", variant="primary")
         with gr.Row():
             custom = gr.Label(label="CNN tự xây dựng", num_top_classes=3)
             mobile = gr.Label(label="MobileNetV2", num_top_classes=3)
-        submit.click(predict, inputs=original, outputs=[crop, custom, mobile])
+            svm = gr.Label(label="SVM · HOG + HSV", num_top_classes=3)
+        submit.click(predict, inputs=original, outputs=[crop, custom, mobile, svm_input, svm])
 
         report_dir = run_dir / "test_streetsurfacevis_mapillary"
         for name, suffix in (("CNN tự xây dựng", ""), ("MobileNetV2", "_mobilenetv2")):
