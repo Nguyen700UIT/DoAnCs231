@@ -17,7 +17,7 @@ NORMALIZE = transforms.Normalize(IMAGENET.mean, IMAGENET.std)
 
 
 def extract_svm_features(image):
-    # Match the HOG + HSV extraction in cs231-svm.ipynb.
+    # Match the shared HOG + HSV extraction in cs231-svm-knn.ipynb.
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     hog_features = hog(
@@ -36,6 +36,22 @@ def extract_svm_features(image):
     ])
     hist_features = hist_features / (np.linalg.norm(hist_features) + 1e-7)
     return np.concatenate([hog_features, hist_features]).astype(np.float32)
+
+
+def predict_bundle(bundle, features):
+    feature_type = bundle["feature_type"]
+    if feature_type == "hsv":
+        features = features[:, 8100:]
+    elif feature_type == "hog":
+        features = features[:, :8100]
+    elif feature_type != "hog_hsv":
+        raise ValueError(f"Unknown feature type: {feature_type}")
+    pipeline = bundle["pipeline"]
+    scores = pipeline.predict_proba(features)[0]
+    return {
+        DISPLAY_NAMES[int(class_id)]: float(score)
+        for class_id, score in zip(pipeline.classes_, scores)
+    }
 
 
 class SmallCustomCNN(nn.Module):
@@ -95,7 +111,8 @@ class RoadPredictor:
         self.mobile = ModifiedMobileNetV2()
         self.mobile.load_state_dict(mobile["model_state_dict"])
         self.mobile.eval()
-        self.svm = joblib.load(run_dir / "hog_hist_svm_pipeline.joblib")
+        self.svm = joblib.load(run_dir / "best_road_svm_bundle.joblib")
+        self.knn = joblib.load(run_dir / "best_road_knn_bundle.joblib")
 
     @torch.inference_mode()
     def predict(self, image_path):
@@ -105,12 +122,9 @@ class RoadPredictor:
         mobile_scores = self.mobile(NORMALIZE(batch)).softmax(dim=1)[0].tolist()
         svm_input = cv2.resize(np.asarray(crop), (128, 128))
         features = extract_svm_features(svm_input).reshape(1, -1)
-        svm_scores = self.svm.predict_proba(features)[0]
-        svm_result = {
-            DISPLAY_NAMES[int(class_id)]: float(score)
-            for class_id, score in zip(self.svm.classes_, svm_scores)
-        }
+        svm_result = predict_bundle(self.svm, features)
+        knn_result = predict_bundle(self.knn, features)
         return (
             crop, dict(zip(DISPLAY_NAMES, custom_scores)),
-            dict(zip(DISPLAY_NAMES, mobile_scores)), svm_input, svm_result,
+            dict(zip(DISPLAY_NAMES, mobile_scores)), svm_input, svm_result, knn_result,
         )
