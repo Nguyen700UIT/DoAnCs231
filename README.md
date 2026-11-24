@@ -1,9 +1,9 @@
 ﻿
 # Demo phân loại mặt đường
 
-Ứng dụng Gradio dùng hai CNN trong `notebooks/cs231-cnn.ipynb` và SVM trong `notebooks/cs231-svm.ipynb`. Tải ảnh đường phố để xem vùng cắt và dự đoán cho ba lớp đường đất, bê tông và lát đá khối.
+Ứng dụng Gradio dùng hai CNN trong `notebooks/cs231-cnn.ipynb` và SVM, KNN trong `notebooks/cs231-svm-knn.ipynb`. Tải ảnh đường phố để xem vùng cắt và dự đoán cho ba lớp đường đất, bê tông và lát đá khối.
 
-Đặt `hog_hist_svm_pipeline.joblib` tải từ `/kaggle/working/` vào `models/` cùng checkpoint CNN. CNN giữ ảnh đầu vào 224 × 224; SVM nhận cùng vùng crop được resize về 128 × 128 và trích HOG + HSV đúng notebook.
+Đặt `best_road_svm_bundle.joblib` và `best_road_knn_bundle.joblib` tải từ `/kaggle/working/` vào `models/` cùng checkpoint CNN. CNN giữ ảnh đầu vào 224 × 224; SVM và KNN nhận cùng vùng crop được resize về 128 × 128. Mỗi bundle chọn đúng đặc trưng đã dùng khi huấn luyện: SVM dùng HOG + HSV, KNN dùng HSV.
 
 Chạy từ thư mục dự án với môi trường Python đã kích hoạt.
 
