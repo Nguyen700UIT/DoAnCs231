@@ -17,7 +17,7 @@ NORMALIZE = transforms.Normalize(IMAGENET.mean, IMAGENET.std)
 
 
 def extract_svm_features(image):
-    # Match the shared HOG + HSV extraction in cs231-svm-knn.ipynb.
+    # Match the shared HOG + HSV extraction in cs231-knn-svm.ipynb.
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     hog_features = hog(
@@ -46,11 +46,11 @@ def predict_bundle(bundle, features):
         features = features[:, :8100]
     elif feature_type != "hog_hsv":
         raise ValueError(f"Unknown feature type: {feature_type}")
-    pipeline = bundle["pipeline"]
-    scores = pipeline.predict_proba(features)[0]
+    model = bundle["model"]
+    scores = model.predict_proba(features)[0]
     return {
         DISPLAY_NAMES[int(class_id)]: float(score)
-        for class_id, score in zip(pipeline.classes_, scores)
+        for class_id, score in zip(model.classes_, scores)
     }
 
 
